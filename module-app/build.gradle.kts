@@ -69,6 +69,7 @@ dependencies {
     compileOnly(libs.rovo89.xposed.api)
     implementation(libs.yukihookapi)
     ksp(libs.yukihookapi.ksp.xposed)
+    implementation(platform(libs.kavaref.bom))
     implementation(libs.kavaref.core)
     implementation(libs.kavaref.extension)
     implementation(libs.betterandroid.ui.extension)
