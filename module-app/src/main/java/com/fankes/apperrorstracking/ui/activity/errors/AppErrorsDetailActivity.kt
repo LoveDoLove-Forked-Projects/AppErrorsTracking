@@ -23,6 +23,7 @@
 
 package com.fankes.apperrorstracking.ui.activity.errors
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -208,12 +209,13 @@ class AppErrorsDetailActivity : BaseActivity<ActivityAppErrorsDetailBinding>() {
         }.onFailure { toast(locale.outputStackFail) }
     }
 
+    @SuppressLint("GestureBackNavigation")
     override fun onBackPressed() {
         intent?.removeExtra(EXTRA_APP_ERRORS_INFO)
         super.onBackPressed()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (initUi(intent)) binding.appPanelScrollView.scrollTo(0, 0)
     }
