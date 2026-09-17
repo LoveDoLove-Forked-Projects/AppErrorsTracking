@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -25,6 +24,9 @@ android {
         versionName = gropify.project.demo.app.versionName
         versionCode = gropify.project.demo.app.versionCode
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake { arguments += "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON" }
+        }
     }
     buildTypes {
         all { signingConfig = signingConfigs.getByName("universal") }

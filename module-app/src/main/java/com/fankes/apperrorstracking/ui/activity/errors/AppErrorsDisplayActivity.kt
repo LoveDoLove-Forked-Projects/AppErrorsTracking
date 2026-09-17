@@ -29,7 +29,6 @@ import com.fankes.apperrorstracking.bean.AppErrorsDisplayBean
 import com.fankes.apperrorstracking.data.ConfigData
 import com.fankes.apperrorstracking.databinding.ActivityAppErrorsDisplayBinding
 import com.fankes.apperrorstracking.databinding.DiaAppErrorsDisplayBinding
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.ui.activity.base.BaseActivity
 import com.fankes.apperrorstracking.utils.factory.colorOf
 import com.fankes.apperrorstracking.utils.factory.getSerializableExtraCompat
@@ -78,7 +77,7 @@ class AppErrorsDisplayActivity : BaseActivity<ActivityAppErrorsDisplayBinding>()
             binding.appInfoItem.isVisible = appErrorsDisplay.isShowAppInfoButton
             binding.closeAppItem.isVisible = appErrorsDisplay.isShowReopenButton.not() && appErrorsDisplay.isShowCloseAppButton
             binding.reopenAppItem.isVisible = appErrorsDisplay.isShowReopenButton
-            binding.processNameText.text = locale.crashProcess(appErrorsDisplay.processName)
+            binding.processNameText.text = getString(R.string.crash_process, appErrorsDisplay.processName)
             binding.appInfoItem.setOnClickListener {
                 cancel()
                 openSelfSetting(appErrorsDisplay.packageName)
@@ -96,13 +95,13 @@ class AppErrorsDisplayActivity : BaseActivity<ActivityAppErrorsDisplayBinding>()
             }
             binding.mutedIfUnlockItem.setOnClickListener {
                 FrameworkTool.mutedErrorsIfUnlock(context, appErrorsDisplay.packageName) {
-                    toast(locale.muteIfUnlockTip(appErrorsDisplay.appName))
+                    toast(getString(R.string.mute_if_unlock_tip, appErrorsDisplay.appName))
                     cancel()
                 }
             }
             binding.mutedIfRestartItem.setOnClickListener {
                 FrameworkTool.mutedErrorsIfRestart(context, appErrorsDisplay.packageName) {
-                    toast(locale.muteIfRestartTip(appErrorsDisplay.appName))
+                    toast(getString(R.string.mute_if_restart_tip, appErrorsDisplay.appName))
                     cancel()
                 }
             }

@@ -23,7 +23,6 @@
 
 package com.fankes.apperrorstracking.ui.activity.debug
 
-import android.app.Activity
 import android.content.Intent
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -35,7 +34,6 @@ import com.fankes.apperrorstracking.const.PackageName
 import com.fankes.apperrorstracking.databinding.ActivitiyLoggerBinding
 import com.fankes.apperrorstracking.databinding.AdapterLoggerBinding
 import com.fankes.apperrorstracking.databinding.DiaLoggerFilterBinding
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.ui.activity.base.BaseActivity
 import com.fankes.apperrorstracking.utils.factory.bindAdapter
 import com.fankes.apperrorstracking.utils.factory.copyToClipboard
@@ -72,7 +70,7 @@ class LoggerActivity : BaseActivity<ActivitiyLoggerBinding>() {
         binding.refreshIcon.setOnClickListener { refreshData() }
         binding.filterIcon.setOnClickListener {
             showDialog<DiaLoggerFilterBinding> {
-                title = locale.filterByCondition
+                title = getString(R.string.filter_by_condition)
                 binding.configCheck0.isChecked = filters.any { it == "D" }
                 binding.configCheck1.isChecked = filters.any { it == "I" }
                 binding.configCheck2.isChecked = filters.any { it == "W" }
@@ -128,15 +126,17 @@ class LoggerActivity : BaseActivity<ActivitiyLoggerBinding>() {
 
     /** 更新列表数据 */
     private fun refreshData() {
-        dataChannel(PackageName.SYSTEM_FRAMEWORK).obtainLoggerInMemoryData {
+        dataChannel(PackageName.SYSTEM_FRAMEWORK).obtainLoggerInMemoryData { logData ->
             listData.clear()
-            it.takeIf { e -> e.isNotEmpty() }?.reversed()?.filter { filters.any { e -> it.priority == e } }?.forEach { e -> listData.add(e) }
+            logData.takeIf { e -> e.isNotEmpty() }?.reversed()?.filter { filters.any { e -> it.priority == e } }?.forEach { e -> listData.add(e) }
             onChanged?.invoke()
             binding.listView.post { binding.listView.setSelection(0) }
             binding.exportAllIcon.isVisible = listData.isNotEmpty()
             binding.listView.isVisible = listData.isNotEmpty()
             binding.listNoDataView.isVisible = listData.isEmpty()
-            binding.listNoDataView.text = if (filters.size < 4) locale.noListResult else locale.noListData
+            binding.listNoDataView.text = if (filters.size < 4)
+                getString(R.string.no_list_result)
+            else getString(R.string.no_list_data)
         }
     }
 
@@ -174,12 +174,12 @@ class LoggerActivity : BaseActivity<ActivitiyLoggerBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) runCatching {
+        if (requestCode == WRITE_REQUEST_CODE && resultCode == RESULT_OK) runCatching {
             data?.data?.let {
                 contentResolver?.openOutputStream(it)?.apply { write(YLog.contents(listData).toByteArray()) }?.close()
-                toast(locale.exportAllLogsSuccess)
-            } ?: toast(locale.exportAllLogsFail)
-        }.onFailure { toast(locale.exportAllLogsFail) }
+                toast(getString(R.string.export_all_logs_success))
+            } ?: toast(getString(R.string.export_all_logs_fail))
+        }.onFailure { toast(getString(R.string.export_all_logs_fail)) }
     }
 
     override fun onResume() {

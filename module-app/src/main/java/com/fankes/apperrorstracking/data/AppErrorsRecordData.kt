@@ -95,11 +95,11 @@ object AppErrorsRecordData {
                     e.versionCode = it.appVersionCodeOf(e.packageName)
                     e.toJsonOrNull()?.also { json -> File(errorsInfoDataFolder.absolutePath, e.jsonFileName).writeText(json) }
                 }.let { result ->
-                if (result != null) {
-                    Settings.Secure.putString(it.contentResolver, keyName, "")
-                    result
-                } else null
-            }
+                    if (result != null) {
+                        Settings.Secure.putString(it.contentResolver, keyName, "")
+                        result
+                    } else null
+                }
         }.getOrNull()
     }
 

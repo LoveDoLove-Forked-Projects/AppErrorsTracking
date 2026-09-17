@@ -23,7 +23,6 @@
 
 package com.fankes.apperrorstracking.ui.activity.errors
 
-import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
 import android.view.ContextMenu
@@ -38,7 +37,6 @@ import com.fankes.apperrorstracking.bean.enum.AppFiltersType
 import com.fankes.apperrorstracking.databinding.ActivityAppErrorsRecordBinding
 import com.fankes.apperrorstracking.databinding.AdapterAppErrorsRecordBinding
 import com.fankes.apperrorstracking.databinding.DiaAppErrorsStatisticsBinding
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.ui.activity.base.BaseActivity
 import com.fankes.apperrorstracking.utils.factory.appIconOf
 import com.fankes.apperrorstracking.utils.factory.appNameOf
@@ -83,10 +81,10 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
         binding.titleBackIcon.setOnClickListener { onBackPressed() }
         binding.appErrorSisIcon.setOnClickListener {
             showDialog {
-                title = locale.notice
-                progressContent = locale.generatingStatistics
+                title = getString(R.string.notice)
+                progressContent = getString(R.string.generating_statistics)
                 noCancelable()
-                FrameworkTool.fetchAppListData(context, AppFiltersBean(type = AppFiltersType.ALL)) {
+                FrameworkTool.fetchAppListData(context, AppFiltersBean(type = AppFiltersType.ALL)) { beans ->
                     newThread {
                         val errorsApps = listData.groupBy { it.packageName }
                             .map { it.key to it.value.size }
@@ -97,18 +95,18 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
                             .map { it.key to it.value.size }
                             .sortedByDescending { it.second }
                             .takeIf { it.isNotEmpty() }?.get(0)?.first?.simpleThwName() ?: ""
-                        val pptCount = (((errorsApps?.size?.toFloat() ?: 0f) * 100f) / it.size.toFloat()).decimal()
+                        val pptCount = (((errorsApps?.size?.toFloat() ?: 0f) * 100f) / beans.size.toFloat()).decimal()
                         runOnUiThread {
                             cancel()
                             showDialog<DiaAppErrorsStatisticsBinding> {
-                                title = locale.appErrorsStatistics
-                                binding.totalErrorsUnitText.text = locale.totalErrorsUnit(listData.size)
-                                binding.totalAppsUnitText.text = locale.totalAppsUnit(it.size)
+                                title = getString(R.string.app_errors_statistics)
+                                binding.totalErrorsUnitText.text = getString(R.string.total_errors_unit, listData.size)
+                                binding.totalAppsUnitText.text = getString(R.string.total_apps_unit, beans.size)
                                 binding.mostErrorsAppIcon.setImageDrawable(appIconOf(mostAppPackageName))
                                 binding.mostErrorsAppText.text = appNameOf(mostAppPackageName).ifBlank { mostAppPackageName }
                                 binding.mostErrorsTypeText.text = mostErrorsType
                                 binding.totalPptOfErrorsText.text = "$pptCount%"
-                                confirmButton(locale.gotIt)
+                                confirmButton(getString(R.string.got_it))
                             }
                         }
                     }
@@ -117,12 +115,12 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
         }
         binding.clearAllIcon.setOnClickListener {
             showDialog {
-                title = locale.notice
-                msg = locale.areYouSureClearErrors
+                title = getString(R.string.notice)
+                msg = getString(R.string.are_you_sure_clear_errors)
                 confirmButton {
                     FrameworkTool.clearAppErrorsInfoData(context) {
                         refreshData()
-                        toast(locale.allErrorsClearSuccess)
+                        toast(getString(R.string.all_errors_clear_success))
                     }
                 }
                 cancelButton()
@@ -130,8 +128,8 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
         }
         binding.exportAllIcon.setOnClickListener {
             showDialog {
-                title = locale.notice
-                msg = locale.areYouSureExportAllErrors
+                title = getString(R.string.notice)
+                msg = getString(R.string.are_you_sure_export_all_errors)
                 confirmButton { exportAll() }
                 cancelButton()
             }
@@ -145,8 +143,8 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
                         binding.appIcon.setImageDrawable(appIconOf(bean.packageName))
                         binding.appNameText.text = appNameOf(bean.packageName).ifBlank { bean.packageName }
                         binding.appUserIdText.isVisible = bean.userId > 0
-                        binding.appUserIdText.text = locale.userId(bean.userId)
-                        binding.errorsTimeText.text = bean.crossTime
+                        binding.appUserIdText.text = getString(R.string.user_id, bean.userId)
+                        binding.errorsTimeText.text = bean.crossTime(this@AppErrorsRecordActivity)
                         binding.errorTypeIcon.setImageResource(if (bean.isNativeCrash) R.drawable.ic_cpp else R.drawable.ic_java)
                         binding.errorTypeText.text = if (bean.isNativeCrash) "Native crash" else bean.exceptionClassName.simpleThwName()
                         binding.errorMsgText.text = bean.exceptionMessage
@@ -161,7 +159,7 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
     /** 更新列表数据 */
     private fun refreshData() {
         FrameworkTool.fetchAppErrorsInfoData(context = this) {
-            binding.titleCountText.text = locale.recordCount(it.size)
+            binding.titleCountText.text = getString(R.string.record_count, it.size)
             binding.listProgressView.isVisible = false
             binding.appErrorSisIcon.isVisible = it.size >= 5
             binding.clearAllIcon.isVisible = it.isNotEmpty()
@@ -177,7 +175,7 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
     /** 打包导出全部 */
     private fun exportAll() {
         clearAllExportTemp()
-        StackTraceShareHelper.showChoose(context = this, locale.exportAll) { sDeviceBrand, sDeviceModel, sDisplay, sPackageName ->
+        StackTraceShareHelper.showChoose(context = this, getString(R.string.export_all)) { sDeviceBrand, sDeviceModel, sDisplay, sPackageName ->
             ("${cacheDir.absolutePath}/temp").also { path ->
                 File(path).mkdirs()
                 listData.takeIf { it.isNotEmpty() }?.forEachIndexed { index, bean ->
@@ -224,8 +222,8 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
                     R.id.aerrors_app_info -> openSelfSetting(listData[it.position].packageName)
                     R.id.aerrors_remove_record ->
                         showDialog {
-                            title = locale.notice
-                            msg = locale.areYouSureRemoveRecord
+                            title = getString(R.string.notice)
+                            msg = getString(R.string.are_you_sure_remove_record)
                             confirmButton { FrameworkTool.removeAppErrorsInfoData(context, listData[it.position]) { refreshData() } }
                             cancelButton()
                         }
@@ -236,13 +234,13 @@ class AppErrorsRecordActivity : BaseActivity<ActivityAppErrorsRecordBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) runCatching {
+        if (requestCode == WRITE_REQUEST_CODE && resultCode == RESULT_OK) runCatching {
             data?.data?.let {
                 contentResolver?.openOutputStream(it)?.apply { write(FileInputStream(outPutFilePath).readBytes()) }?.close()
                 clearAllExportTemp()
-                toast(locale.exportAllErrorsSuccess)
-            } ?: toast(locale.exportAllErrorsFail)
-        }.onFailure { toast(locale.exportAllErrorsFail) }
+                toast(getString(R.string.export_all_errors_success))
+            } ?: toast(getString(R.string.export_all_errors_fail))
+        }.onFailure { toast(getString(R.string.export_all_errors_fail)) }
     }
 
     override fun onResume() {

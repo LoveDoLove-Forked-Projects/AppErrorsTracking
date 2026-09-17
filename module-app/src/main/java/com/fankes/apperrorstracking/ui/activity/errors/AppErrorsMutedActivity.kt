@@ -19,13 +19,15 @@
  *
  * This file is created by fankes on 2022/6/3.
  */
+@file:Suppress("DEPRECATION")
+
 package com.fankes.apperrorstracking.ui.activity.errors
 
 import androidx.core.view.isVisible
+import com.fankes.apperrorstracking.R
 import com.fankes.apperrorstracking.bean.MutedErrorsAppBean
 import com.fankes.apperrorstracking.databinding.ActivityAppErrorsMutedBinding
 import com.fankes.apperrorstracking.databinding.AdapterAppErrorsMutedBinding
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.ui.activity.base.BaseActivity
 import com.fankes.apperrorstracking.utils.factory.appIconOf
 import com.fankes.apperrorstracking.utils.factory.appNameOf
@@ -45,8 +47,8 @@ class AppErrorsMutedActivity : BaseActivity<ActivityAppErrorsMutedBinding>() {
         binding.titleBackIcon.setOnClickListener { onBackPressed() }
         binding.unmuteAllIcon.setOnClickListener {
             showDialog {
-                title = locale.notice
-                msg = locale.areYouSureUnmuteAll
+                title = getString(R.string.notice)
+                msg = getString(R.string.are_you_sure_unmute_all)
                 confirmButton { FrameworkTool.unmuteAllErrorsApps(context) { refreshData() } }
                 cancelButton()
             }
@@ -59,8 +61,8 @@ class AppErrorsMutedActivity : BaseActivity<ActivityAppErrorsMutedBinding>() {
                     binding.appIcon.setImageDrawable(appIconOf(bean.packageName))
                     binding.appNameText.text = appNameOf(bean.packageName).ifBlank { bean.packageName }
                     binding.muteTypeText.text = when (bean.type) {
-                        MutedErrorsAppBean.MuteType.UNTIL_UNLOCKS -> locale.muteIfUnlock
-                        MutedErrorsAppBean.MuteType.UNTIL_REBOOTS -> locale.muteIfRestart
+                        MutedErrorsAppBean.MuteType.UNTIL_UNLOCKS -> getString(R.string.mute_if_unlock)
+                        MutedErrorsAppBean.MuteType.UNTIL_REBOOTS -> getString(R.string.mute_if_restart)
                     }
                     binding.unmuteButton.setOnClickListener { FrameworkTool.unmuteErrorsApp(context, bean) { refreshData() } }
                 }

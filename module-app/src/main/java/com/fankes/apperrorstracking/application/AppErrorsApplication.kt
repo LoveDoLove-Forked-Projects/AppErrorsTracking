@@ -23,8 +23,6 @@ package com.fankes.apperrorstracking.application
 
 import androidx.appcompat.app.AppCompatDelegate
 import com.fankes.apperrorstracking.data.ConfigData
-import com.fankes.apperrorstracking.generated.locale.ModuleAppLocale
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.utils.tool.AppAnalyticsTool
 import com.highcapable.yukihookapi.hook.xposed.application.ModuleApplication
 
@@ -32,8 +30,6 @@ class AppErrorsApplication : ModuleApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        /** 绑定 I18n */
-        locale = ModuleAppLocale.attach(this)
         /** 跟随系统夜间模式 */
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         /** 装载存储控制类 */

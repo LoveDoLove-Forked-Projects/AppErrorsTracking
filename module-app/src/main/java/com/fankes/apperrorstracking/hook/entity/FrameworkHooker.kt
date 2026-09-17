@@ -46,7 +46,9 @@ import com.fankes.apperrorstracking.data.AppErrorsConfigData
 import com.fankes.apperrorstracking.data.AppErrorsRecordData
 import com.fankes.apperrorstracking.data.ConfigData
 import com.fankes.apperrorstracking.data.enum.AppErrorsConfigType
-import com.fankes.apperrorstracking.locale.locale
+import com.fankes.apperrorstracking.hook.entity.FrameworkHooker.AppErrorDialog_DataClass
+import com.fankes.apperrorstracking.hook.entity.FrameworkHooker.AppErrorsClass
+import com.fankes.apperrorstracking.hook.entity.FrameworkHooker.ProcessRecordClass
 import com.fankes.apperrorstracking.ui.activity.errors.AppErrorsDisplayActivity
 import com.fankes.apperrorstracking.ui.activity.errors.AppErrorsRecordActivity
 import com.fankes.apperrorstracking.utils.factory.appNameOf
@@ -69,20 +71,20 @@ object FrameworkHooker : YukiBaseHooker() {
     private val UserControllerClass by lazyClass("com.android.server.am.UserController")
     private val AppErrorsClass by lazyClass("com.android.server.am.AppErrors")
     private val AppErrorDialogClass by lazyClass("com.android.server.am.AppErrorDialog")
-    private val AppErrorDialog_DataClass by lazyClass("com.android.server.am.AppErrorDialog\$Data")
+    private val AppErrorDialog_DataClass by lazyClass($$"com.android.server.am.AppErrorDialog$Data")
     private val ProcessRecordClass by lazyClass("com.android.server.am.ProcessRecord")
     private val ActivityManagerServiceClass by lazyClassOrNull("com.android.server.am.ActivityManagerService")
-    private val ActivityTaskManagerService_LocalServiceClass by lazyClassOrNull("com.android.server.wm.ActivityTaskManagerService\$LocalService")
+    private val ActivityTaskManagerService_LocalServiceClass by lazyClassOrNull($$"com.android.server.wm.ActivityTaskManagerService$LocalService")
 
     private val PackageListClass by lazyClassOrNull(
         VariousClass(
-            "com.android.server.am.ProcessRecord\$PackageList",
+            $$"com.android.server.am.ProcessRecord$PackageList",
             "com.android.server.am.PackageList"
         )
     )
     private val ErrorDialogControllerClass by lazyClassOrNull(
         VariousClass(
-            "com.android.server.am.ProcessRecord\$ErrorDialogController",
+            $$"com.android.server.am.ProcessRecord$ErrorDialogController",
             "com.android.server.am.ErrorDialogController"
         )
     )
@@ -327,18 +329,20 @@ object FrameworkHooker : YukiBaseHooker() {
         val appName = appInfo?.let { context.appNameOf(it.packageName).ifBlank { it.packageName } } ?: packageName
 
         /** 当前 APP 名称 (包含用户 ID) */
-        val appNameWithUserId = if (userId != 0) "$appName (${locale.userId(userId)})" else appName
+        val appNameWithUserId = if (userId != 0) "$appName (${moduleAppResources.getString(R.string.user_id, userId)})" else appName
 
         /** 崩溃标题 */
-        val errorTitle = if (isRepeatingCrash) locale.aerrRepeatedTitle(appNameWithUserId) else locale.aerrTitle(appNameWithUserId)
+        val errorTitle = if (isRepeatingCrash)
+            moduleAppResources.getString(R.string.aerr_repeated_title, appNameWithUserId)
+        else moduleAppResources.getString(R.string.aerr_title, appNameWithUserId)
 
         /** 使用通知推送异常信息 */
         fun showAppErrorsWithNotify() =
             context.pushNotify(
                 channelId = "APPS_ERRORS",
-                channelName = locale.appName,
+                channelName = moduleAppResources.getString(R.string.app_name),
                 title = errorTitle,
-                content = locale.appErrorsTip,
+                content = moduleAppResources.getString(R.string.app_errors_tip),
                 icon = IconCompat.createWithBitmap(moduleAppResources.drawableOf(R.drawable.ic_notify).toBitmap()),
                 color = 0xFFFF6200.toInt(),
                 intent = AppErrorsRecordActivity.intent()

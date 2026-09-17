@@ -27,21 +27,13 @@ object Channel {
         System.loadLibrary("demo_app")
     }
 
-    fun throwRuntimeException() {
-        throw RuntimeException("Exception test")
-    }
+    fun throwRuntimeException(): Unit = throw RuntimeException("Exception test")
 
-    fun throwIllegalStateException() {
-        throw IllegalStateException("Exception test")
-    }
+    fun throwIllegalStateException(): Unit = throw IllegalStateException("Exception test")
 
-    fun throwNullPointerException() {
-        throw NullPointerException("Exception test")
-    }
+    fun throwNullPointerException(): Unit = throw NullPointerException("Exception test")
 
-    fun throwException() {
-        throw Exception()
-    }
+    fun throwException(): Unit = throw Exception()
 
     external fun throwNativeException()
 }

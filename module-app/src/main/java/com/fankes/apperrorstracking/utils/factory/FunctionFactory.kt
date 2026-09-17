@@ -52,7 +52,6 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.fankes.apperrorstracking.R
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.wrapper.BuildConfigWrapper
 import com.google.android.material.snackbar.Snackbar
 import com.highcapable.yukihookapi.hook.factory.field
@@ -357,7 +356,7 @@ fun Context.copyToClipboard(content: String) = runCatching {
     (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).apply {
         setPrimaryClip(ClipData.newPlainText(null, content))
         (primaryClip?.getItemAt(0)?.text ?: "").also {
-            if (it != content) toast(locale.copyFail) else toast(locale.copied)
+            if (it != content) toast(getString(R.string.copy_fail)) else toast(getString(R.string.copied))
         }
     }
 }

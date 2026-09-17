@@ -24,7 +24,6 @@
 package com.fankes.apperrorstracking.ui.activity.errors
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.widget.TextView
@@ -36,7 +35,6 @@ import com.fankes.apperrorstracking.bean.AppErrorsInfoBean
 import com.fankes.apperrorstracking.data.ConfigData
 import com.fankes.apperrorstracking.data.factory.bind
 import com.fankes.apperrorstracking.databinding.ActivityAppErrorsDetailBinding
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.ui.activity.base.BaseActivity
 import com.fankes.apperrorstracking.utils.factory.appIconOf
 import com.fankes.apperrorstracking.utils.factory.appNameOf
@@ -105,13 +103,13 @@ class AppErrorsDetailActivity : BaseActivity<ActivityAppErrorsDetailBinding>() {
         if (appErrorsInfo.isEmpty) {
             binding.appPanelScrollView.isVisible = false
             showDialog {
-                title = locale.notice
-                msg = locale.unableGetAppErrorsRecordTip
-                confirmButton(locale.gotIt) {
+                title = getString(R.string.notice)
+                msg = getString(R.string.unable_get_app_errors_record_tip)
+                confirmButton(getString(R.string.got_it)) {
                     cancel()
                     finish()
                 }
-                cancelButton(locale.goItNow) {
+                cancelButton(getString(R.string.go_it_now)) {
                     cancel()
                     finish()
                     navigate<AppErrorsRecordActivity>()
@@ -123,15 +121,15 @@ class AppErrorsDetailActivity : BaseActivity<ActivityAppErrorsDetailBinding>() {
         binding.appInfoItem.setOnClickListener { openSelfSetting(appErrorsInfo.packageName) }
         binding.printIcon.setOnClickListener {
             loggerE(msg = appErrorsInfo.stackTrace)
-            toast(locale.printToLogcatSuccess)
+            toast(getString(R.string.print_to_logcat_success))
         }
         binding.copyIcon.setOnClickListener {
-            StackTraceShareHelper.showChoose(context = this, locale.copyErrorStack) { sDeviceBrand, sDeviceModel, sDisplay, sPackageName ->
+            StackTraceShareHelper.showChoose(context = this, getString(R.string.copy_error_stack)) { sDeviceBrand, sDeviceModel, sDisplay, sPackageName ->
                 copyToClipboard(appErrorsInfo.stackOutputShareContent(sDeviceBrand, sDeviceModel, sDisplay, sPackageName))
             }
         }
         binding.exportIcon.setOnClickListener {
-            StackTraceShareHelper.showChoose(context = this, locale.exportToFile) { sDeviceBrand, sDeviceModel, sDisplay, sPackageName ->
+            StackTraceShareHelper.showChoose(context = this, getString(R.string.export_to_file)) { sDeviceBrand, sDeviceModel, sDisplay, sPackageName ->
                 stackTrace = appErrorsInfo.stackOutputFileContent(sDeviceBrand, sDeviceModel, sDisplay, sPackageName)
                 runCatching {
                     startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
@@ -144,7 +142,7 @@ class AppErrorsDetailActivity : BaseActivity<ActivityAppErrorsDetailBinding>() {
             }
         }
         binding.shareIcon.setOnClickListener {
-            StackTraceShareHelper.showChoose(context = this, locale.shareErrorStack) { sDeviceBrand, sDeviceModel, sDisplay, sPackageName ->
+            StackTraceShareHelper.showChoose(context = this, getString(R.string.share_error_stack)) { sDeviceBrand, sDeviceModel, sDisplay, sPackageName ->
                 startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                     val content = appErrorsInfo.stackOutputShareContent(sDeviceBrand, sDeviceModel, sDisplay, sPackageName)
                     if (ConfigData.isShareWithFile) {
@@ -161,17 +159,17 @@ class AppErrorsDetailActivity : BaseActivity<ActivityAppErrorsDetailBinding>() {
                         type = "text/plain"
                         putExtra(Intent.EXTRA_TEXT, content)
                     }
-                }, locale.shareErrorStack))
+                }, getString(R.string.share_error_stack)))
             }
         }
         binding.appIcon.setImageDrawable(appIconOf(appErrorsInfo.packageName))
         binding.appNameText.text = appNameOf(appErrorsInfo.packageName).ifBlank { appErrorsInfo.packageName }
         binding.appVersionText.text = appErrorsInfo.versionBrand
         binding.appUserIdText.isVisible = appErrorsInfo.userId > 0
-        binding.appUserIdText.text = locale.userId(appErrorsInfo.userId)
-        binding.appCpuAbiText.text = appErrorsInfo.cpuAbi.ifBlank { locale.noCpuAbi }
-        binding.appTargetSdkText.text = locale.appTargetSdk(appErrorsInfo.targetSdk)
-        binding.appMinSdkText.text = locale.appMinSdk(appErrorsInfo.minSdk)
+        binding.appUserIdText.text = getString(R.string.user_id, appErrorsInfo.userId)
+        binding.appCpuAbiText.text = appErrorsInfo.cpuAbi.ifBlank { getString(R.string.no_cpu_abi) }
+        binding.appTargetSdkText.text = getString(R.string.app_target_sdk, appErrorsInfo.targetSdk)
+        binding.appMinSdkText.text = getString(R.string.app_min_sdk, appErrorsInfo.minSdk)
         binding.jvmErrorPanel.isGone = appErrorsInfo.isNativeCrash
         binding.errorTypeIcon.setImageResource(if (appErrorsInfo.isNativeCrash) R.drawable.ic_cpp else R.drawable.ic_java)
         binding.errorInfoText.text = appErrorsInfo.exceptionMessage
@@ -186,7 +184,7 @@ class AppErrorsDetailActivity : BaseActivity<ActivityAppErrorsDetailBinding>() {
         binding.appPanelScrollView.setOnScrollChangeListener { _, _, y, _, _ ->
             binding.detailTitleText.text = if (y >= 30.dp(context = this@AppErrorsDetailActivity))
                 appNameOf(appErrorsInfo.packageName).ifBlank { appErrorsInfo.packageName }
-            else locale.appName
+            else getString(R.string.app_name)
         }
         return true
     }
@@ -201,12 +199,12 @@ class AppErrorsDetailActivity : BaseActivity<ActivityAppErrorsDetailBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) runCatching {
+        if (requestCode == WRITE_REQUEST_CODE && resultCode == RESULT_OK) runCatching {
             data?.data?.let {
                 contentResolver?.openOutputStream(it)?.apply { write(stackTrace.toByteArray()) }?.close()
-                toast(locale.outputStackSuccess)
-            } ?: toast(locale.outputStackFail)
-        }.onFailure { toast(locale.outputStackFail) }
+                toast(getString(R.string.output_stack_success))
+            } ?: toast(getString(R.string.output_stack_fail))
+        }.onFailure { toast(getString(R.string.output_stack_fail)) }
     }
 
     @SuppressLint("GestureBackNavigation")

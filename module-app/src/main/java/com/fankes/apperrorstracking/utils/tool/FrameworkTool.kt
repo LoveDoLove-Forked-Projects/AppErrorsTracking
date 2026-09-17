@@ -22,12 +22,12 @@
 package com.fankes.apperrorstracking.utils.tool
 
 import android.content.Context
+import com.fankes.apperrorstracking.R
 import com.fankes.apperrorstracking.bean.AppErrorsInfoBean
 import com.fankes.apperrorstracking.bean.AppFiltersBean
 import com.fankes.apperrorstracking.bean.AppInfoBean
 import com.fankes.apperrorstracking.bean.MutedErrorsAppBean
 import com.fankes.apperrorstracking.const.PackageName
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.utils.factory.execShell
 import com.fankes.apperrorstracking.utils.factory.isRootAccess
 import com.fankes.apperrorstracking.utils.factory.showDialog
@@ -211,22 +211,22 @@ object FrameworkTool {
         /** 当 Root 权限获取失败时显示对话框 */
         fun showWhenAccessRootFail() =
             context.showDialog {
-                title = locale.accessRootFail
-                msg = locale.accessRootFailTip
-                confirmButton(locale.gotIt)
+                title = context.getString(R.string.access_root_fail)
+                msg = context.getString(R.string.access_root_fail_tip)
+                confirmButton(context.getString(R.string.got_it))
             }
         context.showDialog {
-            title = locale.notice
-            msg = locale.areYourSureRestartSystem
+            title = context.getString(R.string.notice)
+            msg = context.getString(R.string.are_your_sure_restart_system)
             confirmButton {
                 if (isRootAccess)
                     execShell(cmd = "reboot")
                 else showWhenAccessRootFail()
             }
-            neutralButton(locale.fastRestart) {
+            neutralButton(context.getString(R.string.fast_restart)) {
                 context.showDialog {
-                    title = locale.warning
-                    msg = locale.fastRestartProblem
+                    title = context.getString(R.string.warning)
+                    msg = context.getString(R.string.fast_restart_problem)
                     confirmButton {
                         if (isRootAccess)
                             execShell(cmd = "killall zygote")

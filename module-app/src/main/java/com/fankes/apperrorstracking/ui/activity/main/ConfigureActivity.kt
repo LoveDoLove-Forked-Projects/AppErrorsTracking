@@ -22,6 +22,7 @@
 package com.fankes.apperrorstracking.ui.activity.main
 
 import androidx.core.view.isVisible
+import com.fankes.apperrorstracking.R
 import com.fankes.apperrorstracking.bean.AppFiltersBean
 import com.fankes.apperrorstracking.bean.AppInfoBean
 import com.fankes.apperrorstracking.bean.enum.AppFiltersType
@@ -31,7 +32,6 @@ import com.fankes.apperrorstracking.databinding.ActivityConfigBinding
 import com.fankes.apperrorstracking.databinding.AdapterAppInfoBinding
 import com.fankes.apperrorstracking.databinding.DiaAppConfigBinding
 import com.fankes.apperrorstracking.databinding.DiaAppsFilterBinding
-import com.fankes.apperrorstracking.locale.locale
 import com.fankes.apperrorstracking.ui.activity.base.BaseActivity
 import com.fankes.apperrorstracking.utils.factory.appIconOf
 import com.fankes.apperrorstracking.utils.factory.bindAdapter
@@ -53,16 +53,16 @@ class ConfigureActivity : BaseActivity<ActivityConfigBinding>() {
     override fun onCreate() {
         binding.titleBackIcon.setOnClickListener { finish() }
         binding.globalIcon.setOnClickListener {
-            showAppConfigDialog(locale.globalConfig, isShowGlobalConfig = false) { type ->
+            showAppConfigDialog(getString(R.string.global_config), isShowGlobalConfig = false) { type ->
                 AppErrorsConfigData.putAppShowingType(type)
                 onChanged?.invoke()
             }
         }
         binding.batchIcon.setOnClickListener {
-            showAppConfigDialog(locale.batchOperationsNumber(listData.size), isNotSetDefaultValue = true) { type ->
+            showAppConfigDialog(getString(R.string.batch_operations_number, listData.size), isNotSetDefaultValue = true) { type ->
                 showDialog {
-                    title = locale.notice
-                    msg = locale.areYouSureApplySiteApps(listData.size)
+                    title = getString(R.string.notice)
+                    msg = getString(R.string.are_you_sure_apply_site_apps, listData.size)
                     confirmButton {
                         listData.takeIf { it.isNotEmpty() }?.forEach { AppErrorsConfigData.putAppShowingType(type, it.packageName) }
                         onChanged?.invoke()
@@ -73,7 +73,7 @@ class ConfigureActivity : BaseActivity<ActivityConfigBinding>() {
         }
         binding.filterIcon.setOnClickListener {
             showDialog<DiaAppsFilterBinding> {
-                title = locale.filterByCondition
+                title = getString(R.string.filter_by_condition)
                 binding.filtersRadioUser.isChecked = appFilters.type == AppFiltersType.USER
                 binding.filtersRadioSystem.isChecked = appFilters.type == AppFiltersType.SYSTEM
                 binding.filtersRadioAll.isChecked = appFilters.type == AppFiltersType.ALL
@@ -101,7 +101,7 @@ class ConfigureActivity : BaseActivity<ActivityConfigBinding>() {
                 }
                 cancelButton()
                 if (appFilters.name.isNotBlank())
-                    neutralButton(locale.clearFilters) {
+                    neutralButton(getString(R.string.clear_filters)) {
                         setAppFiltersType()
                         appFilters.name = ""
                         refreshData()
@@ -116,11 +116,11 @@ class ConfigureActivity : BaseActivity<ActivityConfigBinding>() {
                         binding.appIcon.setImageDrawable(bean.icon)
                         binding.appNameText.text = bean.name
                         binding.configTypeText.text = when {
-                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.GLOBAL, bean.packageName) -> locale.followGlobalConfig
-                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.DIALOG, bean.packageName) -> locale.showErrorsDialog
-                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.NOTIFY, bean.packageName) -> locale.showErrorsNotify
-                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.TOAST, bean.packageName) -> locale.showErrorsToast
-                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.NOTHING, bean.packageName) -> locale.showNothing
+                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.GLOBAL, bean.packageName) -> getString(R.string.follow_global_config)
+                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.DIALOG, bean.packageName) -> getString(R.string.show_errors_dialog)
+                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.NOTIFY, bean.packageName) -> getString(R.string.show_errors_notify)
+                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.TOAST, bean.packageName) -> getString(R.string.show_errors_toast)
+                            AppErrorsConfigData.isAppShowingType(AppErrorsConfigType.NOTHING, bean.packageName) -> getString(R.string.show_nothing)
                             else -> "Unknown type"
                         }
                     }
@@ -138,8 +138,8 @@ class ConfigureActivity : BaseActivity<ActivityConfigBinding>() {
         /** 模块未完全激活将显示警告 */
         if (MainActivity.isModuleValied.not())
             showDialog {
-                title = locale.notice
-                msg = locale.moduleNotFullyActivatedTip
+                title = getString(R.string.notice)
+                msg = getString(R.string.module_not_fully_activated_tip)
                 confirmButton { FrameworkTool.restartSystem(context) }
                 cancelButton()
                 noCancelable()
@@ -199,7 +199,7 @@ class ConfigureActivity : BaseActivity<ActivityConfigBinding>() {
         binding.filterIcon.isVisible = false
         binding.listView.isVisible = false
         binding.listNoDataView.isVisible = false
-        binding.titleCountText.text = locale.loading
+        binding.titleCountText.text = getString(R.string.loading)
         FrameworkTool.fetchAppListData(context = this, appFilters) {
             /** 设置一个临时变量用于更新列表数据 */
             val tempsData = ArrayList<AppInfoBean>()
@@ -221,7 +221,7 @@ class ConfigureActivity : BaseActivity<ActivityConfigBinding>() {
                     binding.filterIcon.isVisible = true
                     binding.listView.isVisible = listData.isNotEmpty()
                     binding.listNoDataView.isVisible = listData.isEmpty()
-                    binding.titleCountText.text = locale.resultCount(listData.size)
+                    binding.titleCountText.text = getString(R.string.result_count, listData.size)
                 } else tempsData.clear()
             }
         }
