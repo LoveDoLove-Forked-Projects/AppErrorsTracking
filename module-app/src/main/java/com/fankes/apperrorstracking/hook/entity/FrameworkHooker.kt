@@ -46,9 +46,6 @@ import com.fankes.apperrorstracking.data.AppErrorsConfigData
 import com.fankes.apperrorstracking.data.AppErrorsRecordData
 import com.fankes.apperrorstracking.data.ConfigData
 import com.fankes.apperrorstracking.data.enum.AppErrorsConfigType
-import com.fankes.apperrorstracking.hook.entity.FrameworkHooker.AppErrorDialog_DataClass
-import com.fankes.apperrorstracking.hook.entity.FrameworkHooker.AppErrorsClass
-import com.fankes.apperrorstracking.hook.entity.FrameworkHooker.ProcessRecordClass
 import com.fankes.apperrorstracking.ui.activity.errors.AppErrorsDisplayActivity
 import com.fankes.apperrorstracking.ui.activity.errors.AppErrorsRecordActivity
 import com.fankes.apperrorstracking.utils.factory.appNameOf
@@ -142,6 +139,7 @@ object FrameworkHooker : YukiBaseHooker() {
             ProcessRecordClass.resolve().optional()
                 .firstFieldOrNull {
                     name { it == "mPid" || it == "pid" }
+                    superclass()
                 }?.of(proc)?.get<Int>() ?: 0
         }
 
@@ -151,7 +149,10 @@ object FrameworkHooker : YukiBaseHooker() {
          */
         val userId by lazy {
             ProcessRecordClass.resolve().optional()
-                .firstFieldOrNull { name = "userId" }
+                .firstFieldOrNull {
+                    name = "userId"
+                    superclass()
+                }
                 ?.of(proc)?.get<Int>() ?: 0
         }
 
@@ -161,7 +162,10 @@ object FrameworkHooker : YukiBaseHooker() {
          */
         val appInfo by lazy {
             ProcessRecordClass.resolve().optional()
-                .firstFieldOrNull { name = "info" }
+                .firstFieldOrNull {
+                    name = "info"
+                    superclass()
+                }
                 ?.of(proc)?.get<ApplicationInfo>()
         }
 
@@ -171,7 +175,10 @@ object FrameworkHooker : YukiBaseHooker() {
          */
         val processName by lazy {
             ProcessRecordClass.resolve().optional()
-                .firstFieldOrNull { name = "processName" }
+                .firstFieldOrNull {
+                    name = "processName"
+                    superclass()
+                }
                 ?.of(proc)?.get<String>() ?: ""
         }
 
